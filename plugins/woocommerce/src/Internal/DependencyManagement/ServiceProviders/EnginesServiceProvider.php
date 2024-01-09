@@ -5,7 +5,7 @@
 
 namespace Automattic\WooCommerce\Internal\DependencyManagement\ServiceProviders;
 
-use Automattic\WooCommerce\Internal\DependencyManagement\AbstractServiceProvider;
+use Automattic\WooCommerce\Internal\ReceiptRendering\ReceiptRenderingEngine;
 use Automattic\WooCommerce\Proxies\LegacyProxy;
 use Automattic\WooCommerce\Internal\TransientFiles\TransientFilesEngine;
 
@@ -19,14 +19,16 @@ class EnginesServiceProvider extends AbstractInterfaceServiceProvider {
 	 *
 	 * @var array
 	 */
-	protected $provides = array(
+	protected $provides = [
 		TransientFilesEngine::class,
-	);
+		ReceiptRenderingEngine::class
+	];
 
 	/**
 	 * Register the classes.
 	 */
 	public function register() {
 		$this->share_with_implements_tags( TransientFilesEngine::class )->addArgument( LegacyProxy::class );
+		$this->share_with_implements_tags( ReceiptRenderingEngine::class )->addArgument( TransientFilesEngine::class );
 	}
 }
