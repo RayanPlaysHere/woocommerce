@@ -41,7 +41,7 @@ import { useConfirmUnsavedProductChanges } from '../../hooks/use-confirm-unsaved
 import { PostTypeContext } from '../../contexts/post-type-context';
 import { store as productEditorUiStore } from '../../store/product-editor-ui';
 import { ModalEditor } from '../modal-editor';
-import { ProductEditorSettings } from '../editor';
+import { ProductEditorSettings, ProductTemplate } from '../editor';
 import { BlockEditorProps } from './types';
 
 export function BlockEditor( {
@@ -117,27 +117,41 @@ export function BlockEditor( {
 
 	useLayoutEffect( () => {
 		const productTemplates = settings?.productTemplates ?? [];
-		const productTemplate = productTemplates.find( ( template ) => {
-			if ( productTemplateId === template.id ) {
-				return true;
-			}
+		let productTemplate: ProductTemplate | undefined;
 
-			if ( ! productType ) {
-				return false;
-			}
+		if ( productType ) {
+			if ( productType === 'variable' ) {
+				// Always fallback to the standard product template in case the given
+				// product type is variable.
+				productTemplate = productTemplates.find(
+					( template ) => template.id === 'standard-product-template'
+				);
+			} else {
+				productTemplate = productTemplates.find( ( template ) => {
+					if ( productTemplateId === template.id ) {
+						return true;
+					}
 
-			// Fallback to the product type if the product does not have any product
-			// template associated to itself.
-			return template.productData.type === productType;
-		} );
+					// Fallback to the product type if the product does not have any product
+					// template associated to itself.
+					return template.productData.type === productType;
+				} );
+			}
+		}
 
 		const layoutTemplates = settings?.layoutTemplates ?? [];
 
 		let layoutTemplateId = productTemplate?.layoutTemplateId;
-		// A product variation is not a product type so we can not use it to
-		// fallback to a default layout template. We use a post type instead.
-		if ( ! layoutTemplateId && postType === 'product_variation' ) {
-			layoutTemplateId = 'product-variation';
+		if ( ! layoutTemplateId ) {
+			if ( postType === 'product_variation' ) {
+				// A product variation is not a product type so we can not use it to
+				// fallback to a default layout template. We use a post type instead.
+				layoutTemplateId = 'product-variation';
+			} else {
+				// Always fallback to the simple product layout template in case there
+				// is no layout template associated to the given product.
+				layoutTemplateId = 'simple-product';
+			}
 		}
 
 		const layoutTemplate = layoutTemplates.find(
