@@ -14,7 +14,7 @@ wp option update woocommerce_shop_page_id $post_id
 
 post_id=$(wp post create \
 	--porcelain \
-	--menu_order=1 \
+	--menu_order=2 \
 	--post_type=page \
 	--post_status=publish \
 	--post_author=1 \
@@ -25,7 +25,7 @@ wp option update woocommerce_cart_page_id $post_id
 
 post_id=$(wp post create \
 	--porcelain \
-	--menu_order=2 \
+	--menu_order=3 \
 	--post_type=page \
 	--post_status=publish \
 	--post_author=1 \
@@ -36,7 +36,7 @@ wp option update woocommerce_checkout_page_id $post_id
 
 post_id=$(wp post create \
 	--porcelain \
-	--menu_order=3 \
+	--menu_order=4 \
 	--post_type=page \
 	--post_status=publish \
 	--post_author=1 \
@@ -47,7 +47,7 @@ wp option update woocommerce_myaccount_page_id $post_id
 
 post_id=$(wp post create \
 	--porcelain \
-	--menu_order=4 \
+	--menu_order=5 \
 	--post_type=page \
 	--post_status=publish \
 	--post_author=1 \
@@ -56,7 +56,7 @@ wp option update woocommerce_terms_page_id $post_id
 
 post_id=$(wp post create \
 	--porcelain \
-	--menu_order=5 \
+	--menu_order=6 \
 	--post_type=page \
 	--post_status=publish \
 	--post_author=1 \

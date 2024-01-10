@@ -3,15 +3,12 @@
  */
 import { setDefaultOptions, getDefaultOptions } from 'expect-puppeteer';
 import WooCommerceRestApi from '@woocommerce/woocommerce-rest-api';
-import { SHOP_PAGE, SHOP_CART_PAGE } from '@woocommerce/e2e-utils';
 
 /**
  * Internal dependencies
  */
 import { shopper } from '../../../utils';
-import { merchant } from '../../../utils/merchant';
 import { getTextContent } from '../../page-utils';
-import { SHOP_CHECKOUT_BLOCK_PAGE, useTheme } from '../../utils';
 
 const block = {
 	name: 'Mini-Cart',
@@ -35,16 +32,6 @@ const block = {
 const { selectors } = block;
 
 const options = getDefaultOptions();
-
-const clickMiniCartButton = async () => {
-	await page.hover( '.wc-block-mini-cart__button' );
-
-	await page.waitForSelector( '.wc-block-mini-cart__drawer.is-loading', {
-		hidden: true,
-	} );
-
-	await page.click( '.wc-block-mini-cart__button' );
-};
 
 const closeMiniCartDrawer = async () => {
 	await page.keyboard.press( 'Escape' );
@@ -91,6 +78,7 @@ describe( 'Shopper → Mini-Cart', () => {
 		await shopper.block.goToBlockPage( block.name );
 	} );
 
+<<<<<<< Updated upstream
 	describe( 'Icon', () => {
 		it( 'Shopper can see the Mini-Cart icon and it badge on the front end', async () => {
 			await expect( page ).toMatchElement( '.wc-block-mini-cart' );
@@ -314,6 +302,8 @@ describe( 'Shopper → Mini-Cart', () => {
 		} );
 	} );
 
+=======
+>>>>>>> Stashed changes
 	describe.skip( 'Tax included', () => {
 		let taxSettings;
 		beforeAll( async () => {
@@ -393,192 +383,6 @@ describe( 'Shopper → Mini-Cart', () => {
 					text: '(incl.',
 				}
 			);
-		} );
-	} );
-
-	describe.skip( 'Remove product', () => {
-		beforeAll( async () => {
-			await shopper.block.emptyCart();
-		} );
-
-		afterAll( async () => {
-			await shopper.block.emptyCart();
-		} );
-
-		it( 'Can remove product from Mini-Cart', async () => {
-			await page.click( selectors.frontend.addToCartButton );
-
-			await expect( page ).toMatchElement( '.wc-block-mini-cart__title', {
-				text: 'Your cart (1 item)',
-			} );
-
-			await page.waitForTimeout( 500 ); // Ensure the drawer is fully opened.
-
-			await page.click( '.wc-block-cart-item__remove-link' );
-
-			await expect( page ).toMatchElement(
-				'.wc-block-mini-cart__drawer',
-				{
-					text: 'Your cart is currently empty!',
-				}
-			);
-		} );
-	} );
-
-	describe.skip( 'Cart page', () => {
-		beforeAll( async () => {
-			await shopper.block.emptyCart();
-		} );
-
-		it( 'Can go to cart page from the Mini-Cart Footer', async () => {
-			const [ productTitle ] = await getTextContent(
-				selectors.frontend.productTitle
-			);
-
-			await page.click( selectors.frontend.productWithAddToCartButton );
-
-			await expect( page ).toMatchElement(
-				'.wc-block-mini-cart__products-table',
-				{
-					text: productTitle,
-				}
-			);
-
-			const cartUrl = await page.$eval(
-				'.wc-block-mini-cart__footer-cart',
-				( el ) => el.href
-			);
-
-			expect( cartUrl ).toMatch( SHOP_CART_PAGE );
-
-			await page.goto( cartUrl, { waitUntil: 'networkidle0' } );
-
-			await expect( page ).toMatchElement( 'h1', { text: 'Cart' } );
-
-			await expect( page ).toMatch( productTitle );
-		} );
-	} );
-
-	describe.skip( 'Checkout page', () => {
-		beforeAll( async () => {
-			await shopper.block.emptyCart();
-		} );
-
-		it( 'Can go to checkout page from the Mini-Cart Footer', async () => {
-			const productTitle = await page.$eval(
-				selectors.frontend.productTitle,
-				( el ) => el.textContent
-			);
-
-			await page.click( selectors.frontend.productWithAddToCartButton );
-
-			await expect( page ).toMatchElement(
-				'.wc-block-mini-cart__products-table',
-				{
-					text: productTitle,
-				}
-			);
-
-			const checkoutUrl = await page.$eval(
-				'.wc-block-mini-cart__footer-checkout',
-				( el ) => el.href
-			);
-
-			expect( checkoutUrl ).toMatch( SHOP_CHECKOUT_BLOCK_PAGE );
-
-			await page.goto( checkoutUrl, { waitUntil: 'networkidle0' } );
-
-			await expect( page ).toMatchElement( 'h1', { text: 'Checkout' } );
-
-			const orderSummaryToggle = await page.$(
-				selectors.frontend.checkoutOrderSummary.toggle
-			);
-
-			if ( orderSummaryToggle ) {
-				await orderSummaryToggle.click();
-			}
-
-			await expect( page ).toMatchElement(
-				selectors.frontend.checkoutOrderSummary.content,
-				{ text: productTitle }
-			);
-		} );
-	} );
-
-	describe.skip( 'Translations', () => {
-		beforeAll( async () => {
-			await merchant.changeLanguage( 'nl_NL' );
-			await shopper.block.emptyCart();
-		} );
-
-		beforeEach( async () => {
-			await shopper.block.goToBlockPage( block.name );
-		} );
-
-		afterAll( async () => {
-			await merchant.changeLanguage( '' );
-		} );
-
-		describe( 'Classic Themes', () => {
-			afterAll( async () => {
-				await shopper.block.emptyCart();
-			} );
-
-			it( 'User can see translation in empty Mini-Cart', async () => {
-				await clickMiniCartButton();
-
-				await expect( page ).toMatchElement(
-					'.wc-block-mini-cart__drawer',
-					{
-						text: 'Begin met winkelen',
-					}
-				);
-			} );
-
-			it.skip( 'User can see translation in filled Mini-Cart', async () => {
-				await page.click(
-					selectors.frontend.productWithAddToCartButton
-				);
-
-				await expect( page ).toMatchElement(
-					'.wc-block-mini-cart__footer-cart',
-					{
-						text: 'Bekijk mijn winkelwagen',
-					}
-				);
-			} );
-		} );
-
-		describe( 'Block Themes', () => {
-			useTheme( 'twentytwentytwo' );
-
-			afterAll( async () => {
-				await shopper.block.emptyCart();
-			} );
-
-			it( 'User can see translation in empty Mini-Cart', async () => {
-				await clickMiniCartButton();
-
-				await expect( page ).toMatchElement(
-					'.wc-block-mini-cart__drawer',
-					{
-						text: 'Begin met winkelen',
-					}
-				);
-			} );
-
-			it.skip( 'User can see translation in filled Mini-Cart', async () => {
-				await page.click(
-					selectors.frontend.productWithAddToCartButton
-				);
-
-				await expect( page ).toMatchElement(
-					'.wc-block-mini-cart__footer-cart',
-					{
-						text: 'Bekijk mijn winkelwagen',
-					}
-				);
-			} );
 		} );
 	} );
 } );
